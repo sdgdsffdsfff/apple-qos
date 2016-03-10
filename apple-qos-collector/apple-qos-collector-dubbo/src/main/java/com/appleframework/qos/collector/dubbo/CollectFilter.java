@@ -9,6 +9,8 @@ import com.alibaba.dubbo.common.extension.Activate;
 import com.alibaba.dubbo.common.utils.NetUtils;
 import com.alibaba.dubbo.rpc.*;
 import com.alibaba.dubbo.rpc.support.RpcUtils;
+import com.appleframework.exception.AppleException;
+import com.appleframework.exception.ServiceUnavailableException;
 import com.appleframework.qos.collector.core.CollectApi;
 import com.appleframework.qos.collector.core.URL;
 import com.appleframework.qos.collector.core.utils.DateFormatUtils;
@@ -38,7 +40,24 @@ public class CollectFilter implements Filter {
             long start = System.currentTimeMillis(); // 记录起始时间戮
             try {
                 Result result = invoker.invoke(invocation); // 让调用链往下执行
-                collect(invoker, invocation, result, context, start, false, "0");
+                //collect(invoker, invocation, result, context, start, false, "0");
+                if(result.hasException()) {
+                	if(result.getException() instanceof AppleException ) {
+                		boolean error = false;
+                		if(result.getException() instanceof ServiceUnavailableException ) {
+                			error = true;
+                		}
+                		AppleException e = (AppleException)result.getException();
+                		String code = e.getCode();
+                		collect(invoker, invocation, result, context, start, error, null == code ?"0":code);
+                	}
+                	else {
+                		collect(invoker, invocation, result, context, start, true, String.valueOf(RpcException.BIZ_EXCEPTION + 1));
+                	}
+                }
+                else {
+                	collect(invoker, invocation, result, context, start, false, "0");
+                }
                 return result;
             } catch (RpcException e) {
                 collect(invoker, invocation, null, context, start, true, String.valueOf(e.getCode() + 1));

@@ -6,37 +6,32 @@
 	<parent>
 		<artifactId>apple-qos-server</artifactId>
 		<groupId>com.appleframework.qos</groupId>
-		<version>0.0.2-SNAPSHOT</version>
+		<version>0.0.5.RELEASE</version>
 	</parent>
 	<artifactId>apple-qos-server-statistics</artifactId>
 	<name>apple-qos-server-statistics</name>
 	<url>http://mvnrepo.appleframework.com</url>
-	
-	<properties>
-		<apple.version>0.0.3.RELEASE</apple.version>
-		<config.version>0.1.1.RELEASE</config.version>
-	</properties>
 
 	<dependencies>
 
 		<dependency>
 			<groupId>com.appleframework</groupId>
-			<artifactId>appleframework-core</artifactId>
+			<artifactId>apple-core</artifactId>
 		</dependency>
 				
 		<dependency>
 			<groupId>com.appleframework</groupId>
-			<artifactId>appleframework-web</artifactId>
+			<artifactId>apple-web</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.appleframework.orm</groupId>
+			<artifactId>apple-orm-mybatis</artifactId>
 		</dependency>
 		
 		<dependency>
 			<groupId>com.appleframework</groupId>
-			<artifactId>appleframework-orm</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.appleframework</groupId>
-			<artifactId>appleframework-exception</artifactId>
+			<artifactId>apple-exception</artifactId>
 		</dependency>
 		
 		<dependency>
@@ -49,7 +44,11 @@
 			<groupId>com.appleframework.config</groupId>
 			<artifactId>apple-config-diamond</artifactId>
 		</dependency>
-
+		
+		<dependency>
+			<groupId>com.appleframework.boot</groupId>
+			<artifactId>apple-boot-jetty</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.aspectj</groupId>
@@ -59,11 +58,35 @@
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjweaver</artifactId>
 		</dependency>
+		
+		<dependency>
+		  <groupId>com.fasterxml.jackson.core</groupId>
+		  <artifactId>jackson-core</artifactId>
+		  <version>2.6.0</version>
+		</dependency>
+
+		<dependency>
+		  <groupId>com.fasterxml.jackson.core</groupId>
+		  <artifactId>jackson-databind</artifactId>
+		  <version>2.6.0</version>
+		</dependency>
+
+		<dependency>
+		  <groupId>com.fasterxml.jackson.core</groupId>
+		  <artifactId>jackson-annotations</artifactId>
+		  <version>2.6.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>5.2.2.Final</version>
+		</dependency>
 
 	</dependencies>
-	
-	
+
 	<build>
+
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -81,7 +104,7 @@
 					<artifactId>maven-resources-plugin</artifactId>
 					<version>2.4.3</version>
 					<configuration>
-						<encoding>UTF-8</encoding>
+						<encoding>UTF-8</encoding>  
 					</configuration>
 				</plugin>
 				<plugin>
@@ -184,73 +207,32 @@
 			</plugins>
 		</pluginManagement>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-clean-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-			</plugin>
+			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
+				<configuration>
+					<encoding>UTF-8</encoding>  
+				</configuration>
 			</plugin>
+			
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-deploy-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-archetype-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<executions>
+				<artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptor>src/main/assembly/assembly.xml</descriptor>
+                </configuration>
+                <executions>
 					<execution>
-						<id>aggregate</id>
+						<id>make-assembly</id>
+						<phase>package</phase>
 						<goals>
-							<goal>aggregate</goal>
+							<goal>single</goal>
 						</goals>
-						<phase>site</phase>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-site-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
-			</plugin>
+            </plugin>
 		</plugins>
+		    
 	</build>
-	<distributionManagement>
-		<repository>
-			<id>nexus-releases</id>
-			<name>Local Nexus Releases Repository</name>
-			<url>http://mvnrepo.net:7060/nexus/content/repositories/releases</url>
-		</repository>
-
-		<snapshotRepository>
-			<id>nexus-snapshots</id>
-			<name>Local Nexus Snapshots Repository</name>
-			<url>http://mvnrepo.net:7060/nexus/content/repositories/snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
 	
 </project>

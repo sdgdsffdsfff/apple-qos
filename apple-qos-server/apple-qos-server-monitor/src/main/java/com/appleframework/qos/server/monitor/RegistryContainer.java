@@ -26,14 +26,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.URL;
-import com.alibaba.dubbo.common.extension.ExtensionLoader;
 import com.alibaba.dubbo.common.utils.ConcurrentHashSet;
 import com.alibaba.dubbo.common.utils.NetUtils;
 import com.alibaba.dubbo.container.Container;
 import com.alibaba.dubbo.registry.NotifyListener;
 import com.alibaba.dubbo.registry.RegistryService;
 import com.appleframework.config.core.PropertyConfigurer;
-import com.appleframework.qos.server.monitor.utils.SpringUtility;
 
 /**
  * RegistryContainer
@@ -42,7 +40,7 @@ import com.appleframework.qos.server.monitor.utils.SpringUtility;
  */
 public class RegistryContainer implements Container {
 
-    public static final String REGISTRY_ADDRESS = "dubbo.registry.address";
+    public static final String REGISTRY_ADDRESS = "registry.address";
 
     private final Set<String> applications = new ConcurrentHashSet<String>();
 
@@ -60,26 +58,17 @@ public class RegistryContainer implements Container {
 
     private final Map<String, List<URL>> serviceConsumers = new ConcurrentHashMap<String, List<URL>>();
 
-    private RegistryService registry;
-    
-    private static RegistryContainer INSTANCE = null;
-    
-    public RegistryContainer() {
-        INSTANCE = this;
-    }
-    
-    public static RegistryContainer getInstance() {
-        if (INSTANCE == null) {
-            ExtensionLoader.getExtensionLoader(Container.class).getExtension("registry");
-        }
-        return INSTANCE;
-    }
+    private RegistryService registryService;
 
-    public RegistryService getRegistry() {
-        return registry;
-    }
+	public RegistryService getRegistryService() {
+		return registryService;
+	}
 
-    public Set<String> getApplications() {
+	public void setRegistryService(RegistryService registryService) {
+		this.registryService = registryService;
+	}
+
+	public Set<String> getApplications() {
         return Collections.unmodifiableSet(applications);
     }
     
@@ -240,7 +229,7 @@ public class RegistryContainer implements Container {
         if (url == null || url.length() == 0) {
             throw new IllegalArgumentException("Please set java start argument: -D" + REGISTRY_ADDRESS + "=zookeeper://127.0.0.1:2181");
         }
-        registry = (RegistryService) SpringUtility.getBean("registryService");
+        //registryService = (RegistryService) SpringUtility.getBean("registryService");
         URL subscribeUrl = new URL(Constants.ADMIN_PROTOCOL, NetUtils.getLocalHost(), 0, "",
                                     Constants.INTERFACE_KEY, Constants.ANY_VALUE, 
                                     Constants.GROUP_KEY, Constants.ANY_VALUE, 
@@ -249,7 +238,7 @@ public class RegistryContainer implements Container {
                                     Constants.CATEGORY_KEY, Constants.PROVIDERS_CATEGORY + "," 
                                             + Constants.CONSUMERS_CATEGORY,
                                     Constants.CHECK_KEY, String.valueOf(false));
-        registry.subscribe(subscribeUrl, new NotifyListener() {
+        registryService.subscribe(subscribeUrl, new NotifyListener() {
             public void notify(List<URL> urls) {
                 if (urls == null || urls.size() == 0) {
                     return;
